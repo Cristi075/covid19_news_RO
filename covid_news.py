@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 data_url = 'https://di5ds1eotmbx1.cloudfront.net/latestData.json'
 
 # The counties that I want to display besides the nation-wide numbers
-# TODO: Implement this. After the numbers for nation-wide are displayed nicely
 watched_counties = ['BN', 'CJ', 'MM']
 
 # Global data
@@ -81,10 +80,18 @@ def create_table(organized_data, days):
 
     table.add_row(col_headers)
 
-    for line in organized_data:
-        tmp_row = [line]
-        for data_point in organized_data[line]:
-            tmp_row.append(data_point['infected'])
+    for region_name in organized_data:
+        tmp_row = [region_name]
+        data_len = len(organized_data[region_name])
+        for index in range(data_len):
+            infected =  organized_data[region_name][index]['infected']
+            if index is not data_len-1:
+                delta = infected - organized_data[region_name][index+1]['infected']
+                row_content = str(infected) + ' (+%d)' % delta
+            else:
+                row_content = str(infected) + ' (/)'
+
+            tmp_row.append(row_content)
 
         table.add_row(tmp_row)
 
