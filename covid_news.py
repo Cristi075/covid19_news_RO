@@ -73,18 +73,21 @@ def create_table(organized_data, days):
     table.set_max_width(0)
 
     col_headers = ['\\', str(today.date())]
+    h_align = ['l', 'l']
 
     for days_ago in range(1, days + 1):
         target_day = today - timedelta(days=days_ago)
         col_headers.append(str(target_day.date()))
+        h_align.append('l')
 
     table.add_row(col_headers)
+    table.set_cols_align(h_align)
 
     for region_name in organized_data:
         tmp_row = [region_name]
         data_len = len(organized_data[region_name])
         for index in range(data_len):
-            infected =  organized_data[region_name][index]['infected']
+            infected = organized_data[region_name][index]['infected']
             if index is not data_len-1:
                 delta = infected - organized_data[region_name][index+1]['infected']
                 row_content = str(infected) + ' (+%d)' % delta
