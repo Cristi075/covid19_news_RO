@@ -121,16 +121,16 @@ def main():
 #        print(entry)
 
     # Re-organize data. Create a dictionary that has "name" as a key and days_ago as a series of values
-    d2 = {}
+    organized_data = {}
     # Create the keys first
     for entry in tmp_data[0]:
-        d2[entry['name']] = []
+        organized_data[entry['name']] = []
 
     for day_data in tmp_data:
         for entry in day_data:
-            d2[entry['name']].append(entry)
+            organized_data[entry['name']].append(entry)
 
-    table = create_table(d2, args.days)
+    table = create_table(organized_data, args.days)
     print(table)
 
 
