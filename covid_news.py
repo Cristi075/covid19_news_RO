@@ -1,6 +1,7 @@
 import argparse
 import requests
 import json
+from texttable import Texttable
 from datetime import datetime, timedelta
 
 # endpoint used by the official reporters in Romania
@@ -9,6 +10,9 @@ data_url = 'https://di5ds1eotmbx1.cloudfront.net/latestData.json'
 # The counties that I want to display besides the nation-wide numbers
 # TODO: Implement this. After the numbers for nation-wide are displayed nicely
 watched_counties = ['BN', 'CJ', 'MM']
+
+# Global data
+today = None
 
 
 # Extracts relevant data (for me) and returns a list of dictionaries
@@ -30,6 +34,7 @@ def extract_day_data(day_data, days_ago=0):
 
 
 def extract_historical_data(data, days):
+    global today
     result = []
 
     historical_data = data['historicalData']
@@ -64,6 +69,29 @@ def fetch_data():
     return json_data
 
 
+def create_table(organized_data, days):
+    table = Texttable()
+    table.set_max_width(0)
+
+    col_headers = ['\\', str(today.date())]
+
+    for days_ago in range(1, days + 1):
+        target_day = today - timedelta(days=days_ago)
+        col_headers.append(str(target_day.date()))
+
+    table.add_row(col_headers)
+
+    for line in organized_data:
+        tmp_row = [line]
+        for data_point in organized_data[line]:
+            tmp_row.append(data_point['infected'])
+
+        print(tmp_row)
+        table.add_row(tmp_row)
+
+    return table.draw()
+
+
 def main():
     data = fetch_data()
 
@@ -79,8 +107,21 @@ def main():
     tmp_data = [extract_day_data(current_day_data)]
     historical_data = extract_historical_data(data, args.days)
     tmp_data.extend(historical_data)
-    for entry in tmp_data:
-        print(entry)
+#    for entry in tmp_data:
+#        print(entry)
+
+    # Re-organize data. Create a dictionary that has "name" as a key and days_ago as a series of values
+    d2 = {}
+    # Create the keys first
+    for entry in tmp_data[0]:
+        d2[entry['name']] = []
+
+    for day_data in tmp_data:
+        for entry in day_data:
+            d2[entry['name']].append(entry)
+
+    table = create_table(d2, args.days)
+    print(table)
 
 
 if __name__ == '__main__':
