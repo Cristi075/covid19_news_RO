@@ -86,7 +86,6 @@ def create_table(organized_data, days):
         for data_point in organized_data[line]:
             tmp_row.append(data_point['infected'])
 
-        print(tmp_row)
         table.add_row(tmp_row)
 
     return table.draw()
