@@ -1,7 +1,7 @@
 import argparse
 import requests
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # endpoint used by the official reporters in Romania
 data_url = 'https://di5ds1eotmbx1.cloudfront.net/latestData.json'
@@ -12,23 +12,33 @@ watched_counties = ['BN', 'CJ', 'MM']
 
 
 # Extracts relevant data (for me) and returns a list of dictionaries
-def extract_current_day_data(json_data):
+def extract_day_data(day_data, days_ago=0):
     result = []
 
     # First, extract nation-wise numbers
-    current_day_data = json_data['currentDayStats']
-    if not current_day_data['complete']:
-        print('Warning: Complete flag for current day is set to false')
-
-    tmp_result = {'days_ago': 0, 'name': 'Romania', 'infected': current_day_data['numberInfected']}
+    tmp_result = {'days_ago': days_ago, 'name': 'Romania', 'infected': day_data['numberInfected']}
     result.append(tmp_result)
 
     # Then, extract data for watched counties
-    for county in current_day_data['countyInfectionsNumbers']:
+    for county in day_data['countyInfectionsNumbers']:
         if county in watched_counties:
-            tmp_result1 = {'days_ago': 0, 'name': county,
-                           'infected': current_day_data['countyInfectionsNumbers'][county]}
+            tmp_result1 = {'days_ago': days_ago, 'name': county,
+                           'infected': day_data['countyInfectionsNumbers'][county]}
             result.append(tmp_result1)
+
+    return result
+
+
+def extract_historical_data(data, days):
+    result = []
+
+    historical_data = data['historicalData']
+    today = datetime.strptime(data['currentDayStats']['parsedOnString'], "%Y-%m-%d")
+
+    for days_ago in range(1, days+1):
+        target_day = today - timedelta(days=days_ago)
+        day_data = historical_data[str(target_day.date())]
+        result.append(extract_day_data(day_data, days_ago=days_ago))
 
     return result
 
@@ -61,9 +71,16 @@ def main():
     time = datetime.fromtimestamp(data['lasUpdatedOn'])
     print('Using data from %s' % time)
 
+    current_day_data = data['currentDayStats']
+    if not current_day_data['complete']:
+        print('Warning: Complete flag for current day is set to false')
+
     # Obtain the data that I'm interested in
-    current_day_data = extract_current_day_data(data)
-    print(current_day_data)
+    tmp_data = [extract_day_data(current_day_data)]
+    historical_data = extract_historical_data(data, args.days)
+    tmp_data.extend(historical_data)
+    for entry in tmp_data:
+        print(entry)
 
 
 if __name__ == '__main__':
