@@ -10,7 +10,14 @@ from datetime import datetime, timedelta
 data_url = 'https://di5ds1eotmbx1.cloudfront.net/latestData.json'
 
 # The counties that I want to display besides the nation-wide numbers
-watched_counties = ['BN', 'CJ', 'MM']
+# Remove most of them and leave only the ones that you are interested in here
+watched_counties = ["AB", "AR", "AG", "BC", "BH", "BN",
+                    "BT", "BV", "BR", "BZ", "CS", "CL",
+                    "CJ", "CT", "CV", "DB", "DJ", "GL",
+                    "GR", "GJ", "HR", "HD", "IL", "IS",
+                    "IF", "MM", "MH", "MS", "NT", "OT",
+                    "PH", "SM", "SJ", "SB", "SV", "TR",
+                    "TM", "TL", "VS", "VL", "VN", "B"]
 
 # Global data
 today = None
@@ -128,8 +135,6 @@ def main():
     tmp_data = [extract_day_data(current_day_data)]
     historical_data = extract_historical_data(data, args.days)
     tmp_data.extend(historical_data)
-#    for entry in tmp_data:
-#        print(entry)
 
     # Re-organize data. Create a dictionary that has "name" as a key and days_ago as a series of values
     organized_data = {}
@@ -163,7 +168,6 @@ if __name__ == '__main__':
                         required=False,
                         action='store_true',
                         help='Display only deltas, without the full values')
-
 
     parser.add_argument('--compact',
                         required=False,
