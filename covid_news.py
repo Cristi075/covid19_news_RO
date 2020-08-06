@@ -1,9 +1,9 @@
 import argparse
 import requests
 import json
+import prettytable
 from colorama import init, Fore, Style
 from datetime import datetime, timedelta
-from prettytable import PrettyTable
 
 # endpoint used by the official reporters in Romania
 data_url = 'https://di5ds1eotmbx1.cloudfront.net/latestData.json'
@@ -70,9 +70,12 @@ def fetch_data():
 
 
 def create_table(organized_data, days):
-    table = PrettyTable()
+    if args.compact:
+        table = prettytable.PrettyTable()
+    else:
+        table = prettytable.PrettyTable(hrules=prettytable.ALL)
 
-    col_headers = ['\\', str(today.date())]
+    col_headers = ['\\', Fore.CYAN + str(today.date()) + Style.RESET_ALL]
 
     for days_ago in range(1, days + 1):
         target_day = today - timedelta(days=days_ago)
@@ -85,12 +88,19 @@ def create_table(organized_data, days):
         data_len = len(organized_data[region_name])
         for index in range(data_len):
             infected = organized_data[region_name][index]['infected']
+            if args.deltas:
+                # If this flag is present, display only deltas, without total infected numbers
+                infected = ''
+
             if index is not data_len-1:
-                delta = infected - organized_data[region_name][index+1]['infected']
+                delta = organized_data[region_name][index]['infected'] - organized_data[region_name][index+1]['infected']
                 row_content = str(infected) + Fore.RED + ' (+%d)' % delta + Style.RESET_ALL
             else:
                 row_content = str(infected) + ' (/)'
 
+            # Highlight the first row
+            if index is 0:
+                row_content = Fore.CYAN + row_content + Style.RESET_ALL
             tmp_row.append(row_content)
 
         table.add_row(tmp_row)
@@ -147,6 +157,17 @@ if __name__ == '__main__':
                         default=7,
                         type=int,
                         help='How many days should be displayed. Defaults to 7')
+
+    parser.add_argument('--deltas',
+                        required=False,
+                        action='store_true',
+                        help='Display only deltas, without the full values')
+
+
+    parser.add_argument('--compact',
+                        required=False,
+                        action='store_true',
+                        help='Display a smaller table by omitting the horizontal rules')
 
     args = parser.parse_args()
 
