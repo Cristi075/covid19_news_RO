@@ -1,2 +1,5 @@
 # PyCharm folders
 .idea
+
+# Cached data
+latest_data.json
