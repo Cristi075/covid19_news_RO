@@ -1,8 +1,9 @@
 import argparse
 import requests
 import json
-from texttable import Texttable
+from colorama import init, Fore, Style
 from datetime import datetime, timedelta
+from prettytable import PrettyTable
 
 # endpoint used by the official reporters in Romania
 data_url = 'https://di5ds1eotmbx1.cloudfront.net/latestData.json'
@@ -69,19 +70,15 @@ def fetch_data():
 
 
 def create_table(organized_data, days):
-    table = Texttable()
-    table.set_max_width(0)
+    table = PrettyTable()
 
     col_headers = ['\\', str(today.date())]
-    h_align = ['l', 'l']
 
     for days_ago in range(1, days + 1):
         target_day = today - timedelta(days=days_ago)
         col_headers.append(str(target_day.date()))
-        h_align.append('l')
 
-    table.add_row(col_headers)
-    table.set_cols_align(h_align)
+    table.field_names = col_headers
 
     for region_name in organized_data:
         tmp_row = [region_name]
@@ -90,7 +87,7 @@ def create_table(organized_data, days):
             infected = organized_data[region_name][index]['infected']
             if index is not data_len-1:
                 delta = infected - organized_data[region_name][index+1]['infected']
-                row_content = str(infected) + ' (+%d)' % delta
+                row_content = str(infected) + Fore.RED + ' (+%d)' % delta + Style.RESET_ALL
             else:
                 row_content = str(infected) + ' (/)'
 
@@ -98,11 +95,15 @@ def create_table(organized_data, days):
 
         table.add_row(tmp_row)
 
-    return table.draw()
+    # Align to left in all cells
+    table.align = 'l'
+
+    return table
 
 
 def main():
     data = fetch_data()
+    init()
 
     # Display when the data is from
     time = datetime.fromtimestamp(data['lasUpdatedOn'])
