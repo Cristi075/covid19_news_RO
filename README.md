@@ -13,6 +13,7 @@ You must have Python3 and pip installed in order to use this.
 
 ```shell script
 git clone https://github.com/Cristi075/covid19_news_RO.git
+cd covid19_news_RO
 pip install -r requirements.txt
 python3 covid_news.py
 ```
