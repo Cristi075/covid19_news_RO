@@ -64,7 +64,7 @@ def fetch_data():
         f.close()
     else:
         raw_data = requests.get(data_url)
-        if raw_data.status_code is not 200:
+        if raw_data.status_code != 200:
             print('Error. Endpoint returned status code %s' % raw_data.status_code)
             exit(1)
 
@@ -100,14 +100,14 @@ def create_table(organized_data, days):
                 # If this flag is present, display only deltas, without total infected numbers
                 infected = ''
 
-            if index is not data_len-1:
+            if index != data_len-1:
                 delta = organized_data[region_name][index]['infected'] - organized_data[region_name][index+1]['infected']
                 row_content = str(infected) + Fore.RED + ' (+%d)' % delta + Style.RESET_ALL
             else:
                 row_content = str(infected) + ' (/)'
 
             # Highlight the first row
-            if index is 0:
+            if index == 0:
                 row_content = Fore.CYAN + row_content + Style.RESET_ALL
             tmp_row.append(row_content)
 
