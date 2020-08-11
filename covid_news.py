@@ -21,6 +21,9 @@ watched_counties = ["AB", "AR", "AG", "BC", "BH", "BN",
 
 # Global data
 today = None
+# Change this to any path that you want to use
+# A good choice would be placing it in your home directory 
+cache_file = './latest_data.json'
 
 
 # Extracts relevant data (for me) and returns a list of dictionaries
@@ -59,7 +62,7 @@ def extract_historical_data(data, days):
 def fetch_data():
     if args.cached:
         print('Using cached data')
-        f = open('latest_data.json')
+        f = open(cache_file)
         json_data = json.load(f)
         f.close()
     else:
@@ -70,7 +73,7 @@ def fetch_data():
 
         json_data = json.loads(raw_data.text)
         # Write the response to a file
-        f = open('latest_data.json', 'w')
+        f = open(cache_file, 'w')
         json.dump(json_data, f, indent=4)
         f.close()
 
