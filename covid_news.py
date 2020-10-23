@@ -7,7 +7,7 @@ from colorama import init, Fore, Style
 from datetime import datetime, timedelta
 
 # endpoint used by the official reporters in Romania
-data_url = 'https://di5ds1eotmbx1.cloudfront.net/latestData.json'
+data_url = 'https://d35p9e4fm9h3wo.cloudfront.net/latestData.json'
 
 # The counties that I want to display besides the nation-wide numbers
 # Remove most of them and leave only the ones that you are interested in here
